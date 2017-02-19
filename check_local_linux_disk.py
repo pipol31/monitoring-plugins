@@ -57,8 +57,6 @@ def get_data():
     disk_usage_used = bytes2human(disk_usage.used)
     disk_usage_free = bytes2human(disk_usage.free)
     disk_usage_percent = disk_usage.percent
-    # sdiskusage(total=21378641920, used=4809781248, free=15482871808, percent=22.5)
-
     return disk_usage_total,disk_usage_used,disk_usage_free,disk_usage_percent
 
 def main():
