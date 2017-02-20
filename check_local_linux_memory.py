@@ -5,7 +5,7 @@
 #   Autors: David Hannequin <david.hannequin@gmail.com>,
 #   Date: 2017-02-17
 #   URL: https://github.com/hvad/monitoring-plugins
-#   
+#
 #   Plugins to check linux memory usage.
 #
 # Shinken plugin is free software: you can redistribute it and/or modify
@@ -21,11 +21,16 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with Shinken.  If not, see <http://www.gnu.org/licenses/>.
 #
-# Requires: Python >= 2.7 
+# Requires: Python >= 2.7
 # Requires: Psutil
 
-import argparse
-import psutil
+try:
+    import argparse
+    import psutil
+
+    found = True
+except ImportError, e:
+    found = False
 
 def parse_args():
     parser = argparse.ArgumentParser()
@@ -34,7 +39,7 @@ def parse_args():
     args = parser.parse_args()
     warning = args.warning
     critical = args.critical
-    
+
     return warning,critical
 
 def bytes2human(n):
@@ -69,7 +74,10 @@ def main():
 
     total,available,percent,used,active,inactive = get_data()
 
-    if percent >= critical:
+    if found == False:
+        print ('UNKNOWN - some lib are missing %s !!' % e)
+        raise SystemExit(3)
+    elif percent >= critical:
         print ('CRITICAL - Memory percentage usage : %2.1f%% Total Memory : %s Free Memory : %s Used Memory : %s |mem_percent =%s;%s;%s;0;100' % (percent, total, inactive, active, percent, warning, critical))
         raise SystemExit(2)
     elif percent >= warning:

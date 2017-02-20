@@ -7,8 +7,13 @@
 # Requires: Python >= 2.7 or Python plus argparse
 #
 
-import os
-import argparse
+try:
+    import os
+    import argparse
+
+    found = True
+except ImportError, e:
+    found = False
 
 def main():
     parser = argparse.ArgumentParser()
@@ -23,8 +28,10 @@ def main():
     (wload1, wload5, wload15) = warning
 
     (load1, load5, load15) = os.getloadavg()
-
-    if load1 >= cload1 or load5 >= cload5 or load15 >= cload15:
+    if found == False:
+        print ('UNKNOWN - some lib are missing %s !!' % e)
+        raise SystemExit(3)
+    elif load1 >= cload1 or load5 >= cload5 or load15 >= cload15:
         print ('CRITICAL - Load average : %s,%s,%s|load1=%s;load5=%s;load15=%s'
                % (load1, load5, load15, load1, load5, load15))
         raise SystemExit(2)

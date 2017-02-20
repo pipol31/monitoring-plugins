@@ -5,7 +5,7 @@
 #   Autors: David Hannequin <david.hannequin@gmail.com>,
 #   Date: 2017-02-17
 #   URL: https://github.com/hvad/monitoring-plugins
-#   
+#
 #   Plugins to check linux disk usage.
 #
 # Shinken plugin is free software: you can redistribute it and/or modify
@@ -21,11 +21,16 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with Shinken.  If not, see <http://www.gnu.org/licenses/>.
 #
-# Requires: Python >= 2.7 
+# Requires: Python >= 2.7
 # Requires: Psutil
 
-import argparse
-import psutil
+try:
+    import argparse
+    import psutil
+
+    found = True
+except ImportError, e:
+    found = False
 
 def parse_args():
     parser = argparse.ArgumentParser()
@@ -36,7 +41,7 @@ def parse_args():
     partition = args.partition
     warning = args.warning
     critical = args.critical
-    
+
     return warning,critical,partition
 
 def bytes2human(n):
@@ -64,8 +69,10 @@ def main():
     warning,critical,partition = parse_args()
 
     disk_usage_total,disk_usage_used,disk_usage_free,disk_usage_percent = get_data()
-
-    if disk_usage_percent >= critical:
+    if found == False:
+        print ('UNKNOWN - some lib are missing %s !!' % e)
+        raise SystemExit(3)
+    elif disk_usage_percent >= critical:
         print ('CRITICAL - Disk percentage usage : %2.1f%% Total Disk : %s Free Disk : %s Used Disk : %s |disk_percent =%s;%s;%s;0;100' % (disk_usage_percent, disk_usage_total, disk_usage_free, disk_usage_used, disk_usage_percent, warning, critical))
         raise SystemExit(2)
     elif disk_usage_percent >= warning:
